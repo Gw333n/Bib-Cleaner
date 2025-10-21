@@ -1,0 +1,27 @@
+[project]
+authors = [
+  { name = "Gwendal Debaussart-Joniec", email = "gwendal.debaussart@ens-paris-saclay.fr" },
+]
+maintainers = [
+  { name = "Gwendal Debaussart-Joniec", email = "gwendal.debaussart@ens-paris-saclay.fr" },
+]
+name = "bib-cleaner"
+description = "A package to clean bibliography files by removing 'unnecessary' fields such as URL, ISSN, ISBN, and DOI."
+readme = "README.md"
+license = { file = "LICENSE" }
+dynamic = ["version"]
+
+[tool.setuptools.dynamic]
+version = { attr = "bib_cleaner.__version__" }
+
+[tool.setuptools.packages.find]
+include = ["bib_cleaner"]
+
+[project.urls]
+Repository = "https://github.com/Gw333n/Bib-Cleaner"
+
+[project.scripts]
+bibclean = "bib_cleaner.cleaner:main"
+
+[build-system]
+requires = ["setuptools", "toml"]
