@@ -1,31 +1,10 @@
 import re
 import shutil
 
-
-def clean_bibtex(file_path="bib.bib"):
-    """
-    Cleans a BibTeX file by removing specific fields (url, issn, isbn, doi) from each entry.
-
-    Args:
-        file_path (str):
-          Path to the original BibTeX file.
-    """
-    fields = ["url", "issn", "isbn", "doi"]
-    patterns = [rf'^\s*{fld}\s*=\s*[{{"].*?[}}"],?\s*$' for fld in fields]
-    regex = re.compile("|".join(patterns), flags=re.IGNORECASE)
-
-    cleaned_lines = []
-    with open(file_path, "r", encoding="utf-8") as f:
-        for line in f:
-            if regex.match(line.strip()):
-                continue
-            cleaned_lines.append(line)
-
-    with open(file_path, "w", encoding="utf-8") as f:
-        f.writelines(cleaned_lines)
-
-    print(f"'{file_path}' cleaned (removed url, issn, isbn, doi).")
-
+def regex_bibtex(fields: list) -> re.Pattern:
+  patterns = [rf'^\s*{fld}\s*=\s*[{{"].*?[}}"],?\s*' for fld in fields]
+  regex = re.compile("|".join(patterns), flags=re.IGNORECASE)
+  return regex
 
 def clean_bibliography(file_path, backup=False):
     """
@@ -42,7 +21,17 @@ def clean_bibliography(file_path, backup=False):
         shutil.copy(file_path, name + ".bak")
         print(f"Backup created: {name}.bak")
     if format.lower() == "bib":
-        clean_bibtex(file_path)
+        regex = regex_bibtex(["url", "issn", "isbn", "doi", "notes", "pages"])
     else:
-        print(f"Format '{format}' not supported for cleaning.")
+        raise ValueError(f"Format '{format}' not supported for cleaning.")
+    with open(file_path, "r", encoding="utf-8") as f:
+        cleaned_lines = []
+        for line in f:
+            match = regex.search(line)
+            if match:
+                line = line.replace(match.group(0), "")
+            cleaned_lines.append(line)
+    with open(file_path, "w", encoding="utf-8") as f:
+        f.writelines(cleaned_lines)
 
+    print(f"'{file_path}' cleaned (removed url, issn, isbn, doi, notes, pages).")

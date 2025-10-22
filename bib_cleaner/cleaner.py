@@ -18,3 +18,7 @@ def cli():
 def main():
     args = cli()
     clean_bibliography(file_path=args.input_file, backup=args.backup)
+
+main()
+
+
