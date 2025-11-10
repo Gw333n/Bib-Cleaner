@@ -1,12 +1,14 @@
 import re
 import shutil
 
-def regex_bibtex(fields: list) -> re.Pattern:
-  patterns = [rf'^\s*{fld}\s*=\s*[{{"].*?[}}"],?\s*' for fld in fields]
-  regex = re.compile("|".join(patterns), flags=re.IGNORECASE)
-  return regex
 
-def clean_bibliography(file_path, backup=False):
+def regex_bibtex(fields: list) -> re.Pattern:
+    patterns = [rf'^\s*{fld}\s*=\s*[{{"].*?[}}"],?\s*' for fld in fields]
+    regex = re.compile("|".join(patterns), flags=re.IGNORECASE)
+    return regex
+
+
+def clean_bibliography(file_path, backup=False, fields=None):
     """
     Cleans a bibliographic file by removing specific fields (url, issn, isbn, doi) from each entry.
 
@@ -16,12 +18,25 @@ def clean_bibliography(file_path, backup=False):
         backup (bool): default = False
           Whether to create a backup of the original file.
     """
+
+    if fields is None:
+        fields = [
+            "url",
+            "issn",
+            "isbn",
+            "doi",
+            "notes",
+            "pages",
+            "file",
+            "language",
+            "abstract",
+        ]
     name, format = file_path.rsplit(".", 1)
     if backup:
         shutil.copy(file_path, name + ".bak")
         print(f"Backup created: {name}.bak")
     if format.lower() == "bib":
-        regex = regex_bibtex(["url", "issn", "isbn", "doi", "notes", "pages"])
+        regex = regex_bibtex(fields)
     else:
         raise ValueError(f"Format '{format}' not supported for cleaning.")
     with open(file_path, "r", encoding="utf-8") as f:
